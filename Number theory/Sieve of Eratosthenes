@@ -1,0 +1,19 @@
+This algo can find the number of primes within a range[1->n] within a complexity of O(nloglog(n))
+int N=100001;
+vector<bool>primes(N,1);
+void build()
+{
+    primes[0]=0;
+    primes[1]=0;
+
+    for(int i=2;i*i<=N;i++)
+    {
+        if(primes[i]==1)
+        {
+            for(int j=i*i;j<=N;j+=i)
+            {
+                primes[j]=0;
+            }
+        }
+    }
+}
