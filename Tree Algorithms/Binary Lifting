@@ -1,0 +1,98 @@
+//Binary lifting is an optimized methord of finding the LCA and Kth ancestor by in a time complexity of around 
+//O(nlogn) for creating the binary lifting matrix; and O(logn) for searching (mostlly used in queries) 
+//Space complexity of the matrix is nearly O(nlogn) but I am taking (32*n) for saftey.
+
+void dfs(int i,int par,int level,vector<vector<int>>&adj,vector<vector<int>>&asgn,vector<int>&depth)
+{
+    depth[i]=level;
+    for(auto it:adj[i])
+    {
+        if(it!=par)
+        {
+            asgn[it][0]=i;
+            dfs(it,i,level+1,adj,asgn,depth);
+        }
+    }
+}
+ 
+ 
+int kth_ancestor1(int p,int k,vector<vector<int>>&a)
+{
+    if(k==0)
+        return p;
+    int jump=log2(k);
+    int val=pow(2,jump);
+    return kth_ancestor1(a[p][jump],k-val,a);
+}
+ 
+ 
+int kth_ancestor2(int node,int k,vector<vector<int>>&a)
+{
+    for(int i=31;i>=0;i--)
+    {
+        if((1<<i)&k)
+        {
+            node=a[node][i];
+            if(node==-1)
+                return -1;
+        }
+    }
+    return node;
+}
+ 
+ 
+int lca(int u,int v,vector<int>&depth,vector<vector<int>>&asgn)
+{
+    //cout<<"ok"<<endl;
+    if(depth[u]>depth[v])
+        return lca(v,u,depth,asgn);  //if depth[u] is greater we will change it such that depth[u] is always smaller
+ 
+    int dif=depth[v]-depth[u]; // taking the difference in depths
+    for(int i=31;i>=0;i--)
+    {
+        if((1<<i)&dif)
+        {
+            v=asgn[v][i];    //after this this now our nodes are at the same depth
+        }
+    }
+    if(u==v)
+        return u;         //IMP without this our function will give a wa
+    for(int i=31;i>=0;i--)
+    {
+        if(asgn[u][i]!=asgn[v][i])
+        {
+            u=asgn[u][i];
+            v=asgn[v][i];  // going from the root towards down
+        }
+    }
+    return asgn[v][0];
+}
+ 
+void solver()
+{
+    int n;
+    cin>>n;
+    vector<vector<int>>adj(n+1);
+    for(int i=0;i<n-1;i++)
+    {
+        int a,b;
+        cin>>a>>b;
+        adj[a].pb(b);
+        adj[b].pb(a);
+    }
+    vector<vector<int>>asgn(n+1,vector<int>(32,-1));//for safe side take it as 32, will be good in the lca calculation
+    vector<int>depth(n+1,0);//Depth will be required in finding lca
+    dfs(1,-1,1,adj,asgn,depth);//we have to find the initial parents of each node, acts as our base case in dp
+ 
+    for(int i=1;i<32;i++)//Intialization starts by assigning the next smaller parent in each node
+    {
+        for(int j=1;j<=n;j++)
+        {
+            int inter=asgn[j][i-1];
+            if(inter!=-1)
+                asgn[j][i]=asgn[inter][i-1];
+        }
+    }
+    // for(auto it:depth)
+    //     cout<<it<<endl;
+}
