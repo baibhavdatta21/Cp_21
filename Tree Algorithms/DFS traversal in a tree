@@ -1,0 +1,34 @@
+//Note->TC->O(v+e) 
+ //     SC->O(n+e)//adj list + O(n) //traversal vector
+//here v is the vertices, and e is the edges.  here the recursive function will run for v times and  total number of times the loop will run
+//(combining all the vertices) is 2e, ignoring the constant factor 2, our time complexity becomes O(v+e)
+
+void dfs(int i,int par,vector<vector<int>>&adj,vector<int>&tra)
+{
+    tra.push_back(i);          // Pushing in the dfs
+    for(auto it:adj[i])
+    { 
+        if(it!=par)            // we wont be taking in the it==par as it will lead to infinite loop
+        {
+            dfs(it,i,adj,tra); 
+        }
+    }
+}                    
+void solver()
+{
+    int n; //Take the size of the number of vertices
+    cin>>n;
+    vector<vector<int>>adj(n+1); //defing the indices as 1 based as most problems in codeforces follow 1-based indexing
+    for(int i=1;i<=n-1;i++)
+    {
+        int a,b;
+        cin>>a>>b;
+        adj[a].push_back(b);
+        adj[b].push_back(a);
+    }
+    vector<int>tra;     // Holding the dfs traversal
+    dfs(1,-1,adj,tra);      // calling the dfs function taking the root node as 1
+    for(auto it:tra)
+        cout<<it<<" ";      // printing the dfs function
+
+}
