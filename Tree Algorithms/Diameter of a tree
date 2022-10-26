@@ -1,0 +1,47 @@
+//Diameter gives the maximum distance between 2 nodes in a tree
+// its just running the dfs twice
+
+void dfs(int i,int par,vector<vector<int>>&v,int level,int &hold,int &idx)
+{
+    if(level>hold)
+    {
+        hold=level;
+        idx=i;
+    }
+    for(auto it:v[i])
+    {
+        if(it!=par)
+        dfs(it,i,v,level+1,hold,idx);
+    }
+}
+void dfs(int i,int par,vector<vector<int>>&v,int level,int &maxi)
+{
+    maxi=max(maxi,level);
+    for(auto it:v[i])
+    {
+        if(it!=par)
+        dfs(it,i,v,level+1,maxi);
+    }
+}
+void solver()
+{
+    int n;
+    cin>>n;
+    vector<vector<int>>v(n+1);  //following 1-Based indexing
+    for(int i=0;i<n-1;i++)
+    {
+        int a,b;
+        cin>>a>>b;
+        //cout<<a<<" "<<b<<endl;
+        v[a].push_back(b);
+        v[b].push_back(a);
+    }
+    int maxi=0;
+    int level=0;
+    int idx=0;
+    int hold=0;
+    dfs(1,-1,v,level,hold,idx);  // getting one side of the diameter of a node
+    //cout<<hold<<" "<<idx<<endl;
+    dfs(idx,-1,v,level,maxi);    // getting the maxi and the other side of the node
+    cout<<maxi<<endl;
+}
