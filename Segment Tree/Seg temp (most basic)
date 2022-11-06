@@ -1,0 +1,43 @@
+void build(int idx,int l,int h,vector<int>&v,vector<int>&seg)
+{
+    if(l==h)
+    {
+        seg[idx]=v[l];
+        return;
+    }
+ 
+    int mid=l+((h-l)>>1);
+    build(2*idx+1,l,mid,v,seg);
+    build(2*idx+2,mid+1,h,v,seg);
+ 
+    seg[idx]=gcd(seg[2*idx+1],seg[2*idx+2]);
+}
+void update(int idx,int l,int h,int i,int val,vector<int>&seg)
+{
+    if(l==h)
+    {
+        seg[idx]=val;
+        return;
+    }
+ 
+    int mid=l+((h-l)>>1);
+    if(mid>=i)
+        update(2*idx+1,l,mid,i,val,seg);
+    else
+        update(2*idx+2,mid+1,h,i,val,seg);
+    seg[idx]=gcd(seg[2*idx+1],seg[2*idx+2]);
+}
+int query(int idx,int l,int h,int i,int j,int val,vector<int>&seg,int &f)
+{
+    //cout<<l<<" "<<h<<endl;
+    if(i<=l && j>=h)
+    {
+        return seg[idx];
+    }
+    if(i>h || j<l)
+        return 0;
+ 
+    int mid=l+((h-l)>>1);
+ 
+    return gcd(query(2*idx+1,l,mid,i,j,val,seg,f),query(2*idx+2,mid+1,h,i,j,val,seg,f));
+}
