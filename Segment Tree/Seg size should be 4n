@@ -1,0 +1,101 @@
+This article basically states that if the size is multiple of 2 then the seg tree will be a complete binary tree and the size of the seg should be (n+n-1) n for the last
+line and remaining for the internal nodes.
+
+But the max situation will arrise when the size is like n=5
+
+here we will have to make a whole new row and this is where the max case arrises.
+
+
+
+Article link->https://www.quora.com/Why-does-4-*-N-space-have-to-be-allocated-for-a-segment-tree-where-N-is-the-size-of-the-original-array
+
+
+Here segment tree does SUM of elements, so it is useful to use in RSQ (Range sum query)
+
+—
+
+a = [1];
+
+st [1]
+
+1
+
+—
+
+a = [1, 2];
+
+st [3,1,2]
+
+....…..3………
+
+..…1…2…….. <———————— n (2) is power of 2, 2*n-1 is st size
+
+—
+
+a = [1, 2, 3];
+
+st [6,3,3,1,2,".","."]
+
+……….. 6……….
+
+……3……..3….. <—— n (3) is Not power of 2
+
+..1…2………..<—— st size got doubled (one more line means double eles)
+
+—
+
+a = [1, 2, 3, 4];
+
+st [10,3,7,1,2,3,4]
+
+………....10……..………..
+
+……3…….…….7………..
+
+…1…2….. 3…4…… <———————— n (4) is power of 2, 2*n-1 is st size
+
+—
+
+a = [1, 2, 3, 4, 5];
+
+st [15,6,9,3,3,4,5,1,2,".",".",".",".",".","."]
+
+………….15……………..
+
+…..6……………9……….
+
+...3…3…….4…5….. <—— n (5) is Not power of 2
+
+1..2………………… <—— st size got doubled (one more line means double eles)
+
+—
+
+From above, below can derived:
+
+if N is power of 2, then segment tree needs 2*N -1
+so if array a, is 4
+then st will have 2*4–1 = 7 elements
+4 (N) are leaf nodes
+3 (N-1) are internal nodes
+if we increase only 1 element in a from 4 to 5 then what happens?
+st gets doubled. see point 3 below
+if N is Not power of 2, then we need to go to next power of 2 (if 5, then 8), say 8s is 2 pow 3, say 3 x, then we need 2*x -1
+Going to next power of 2 means we doubled the size (multiplied by 2)
+But we only increased 1 element in array from 4 to 5, so it is almost 4 times (because it st was already 2 times when array was 4 elements)
+N elements are leafs
+N-1 elements are internal nodes
+2(N-1) - 2 elements are unused
+Approx 4N elements when array size is not 2 power
+That’s all.
+
+Task: Now draw segment tree (st) for below 3 ‘a’s:
+
+[1, 2, 3, 4, 5, 6]
+[1, 2, 3, 4, 5, 6, 7]
+[1, 2, 3, 4, 5, 6, 7, 8]
+Cross check with above diagrams.
+
+Hope that helped. Best of luck.
+
+
+
