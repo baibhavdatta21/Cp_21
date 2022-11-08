@@ -1,0 +1,48 @@
+Xor and tries have a relation; when we are asked to find the max xor, or if we simply have a prob D Xor question we must remember this methord
+
+Insert function is for inserting the values in the trie
+Del for deleting certain values
+Solver gives the heighest xor value from our current trie
+
+all work in time complexity of O(1)
+
+class Node{
+public:
+    vector<Node*>links;
+    int count;
+    Node(){
+        links.resize(2);
+        count=0;
+    }
+};
+void insert(int val,Node* dum){
+    for(int i=31;i>=0;i--){
+        if(dum->links[(val>>i)&1]==NULL)
+            dum->links[(val>>i)&1]=new Node;
+        dum=dum->links[(val>>i)&1];
+        dum->count++;
+    }
+}
+void del(int val,Node* dum){
+    for(int i=31;i>=0;i--){
+        dum=dum->links[(val>>i)&1];
+        dum->count--;
+        // if((dum->count)==0){
+        //     dum->links[(val>>i)&1]=NULL;
+        //     break;
+        //}   
+    }
+}
+int solver(int val,Node* dum){
+    int maxi=0;
+    for(int i=31;i>=0;i--){
+        int want=1-(val>>i)&1;
+        if(dum->links[want]!=NULL && dum->links[want]->count!=0){
+            dum=dum->links[want];
+            maxi|=(1<<i);
+        }
+        else
+            dum=dum->links[1-want];
+    }
+    return maxi;
+}
