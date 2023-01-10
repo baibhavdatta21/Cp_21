@@ -1,0 +1,211 @@
+without class
+void build(int ind,int low,int high,vector<int>&seg,vector<int>&v){
+    if(low == high) {
+            seg[ind] = v[low];
+            return; 
+        }
+        int mid = (low + high) >> 1; 
+        build(2*ind+1, low, mid,seg,v); 
+        build(2*ind+2, mid+1, high,seg,v); 
+        seg[ind] = min(seg[2*ind+1], seg[2*ind+2]);
+}
+
+
+void update(int ind,int low,int high,int l,int h,int val,vector<int>&seg,vector<int>&lazy){
+        // update the previous remaining updates 
+        // and propogate downwards 
+        if(lazy[ind] != 0) {
+            seg[ind] += lazy[ind]; 
+            // propogate the lazy update downwards
+            // for the remaining nodes to get updated 
+            if(low != high) {
+                lazy[2*ind+1] += lazy[ind]; 
+                lazy[2*ind+2] += lazy[ind]; 
+            }
+ 
+            lazy[ind] = 0; 
+        }
+ 
+        // no overlap 
+        // we don't do anything and return 
+        // low high l r or l r low high 
+        if(high < l or h < low) {
+            return; 
+        }
+ 
+        // complete overlap 
+        // l low high r 
+        if(low>=l && high <= h) {
+            seg[ind] += val; 
+            // if a leaf node, it will have childrens
+            if(low != high) {
+                lazy[2*ind+1] += val; 
+                lazy[2*ind+2] += val; 
+            }
+            return; 
+        }
+        // last case has to be no overlap case
+        int mid = (low + high) >> 1; 
+        update(2*ind+1, low, mid, l, h, val,seg,lazy);
+        update(2*ind+2, mid+1, high, l, h, val,seg,lazy); 
+        seg[ind] = min(seg[2*ind+1], seg[2*ind+2]); 
+}
+int query(int ind,int low,int high,int l,int h,vector<int>&seg,vector<int>&lazy){
+    
+        // update if any updates are remaining 
+        // as the node will stay fresh and updated 
+        if(lazy[ind] != 0) {
+            seg[ind] += lazy[ind]; 
+            // propogate the lazy update downwards
+            // for the remaining nodes to get updated 
+            if(low != high) {
+                lazy[2*ind+1] += lazy[ind]; 
+                lazy[2*ind+2] += lazy[ind]; 
+            }
+ 
+            lazy[ind] = 0; 
+        }
+ 
+        // no overlap return 0; 
+        if(high < l or h < low) {
+            return INT_MAX; 
+        }
+ 
+        // complete overlap 
+        if(low>=l && high <= h) return seg[ind]; 
+ 
+        int mid = (low + high) >> 1; 
+        int left = query(2*ind+1, low, mid, l, h,seg,lazy);
+        int right = query(2*ind+2, mid+1, high, l, h,seg,lazy);
+        return min(left,right); 
+}
+
+
+
+
+
+
+
+
+With CLASS
+
+
+class segmentTree
+{
+public:
+	vector<int> st;
+	vector<int> lazy;
+	int n;
+ 
+	segmentTree(int n)
+	{
+		this->n = n;
+		st.resize(4 * n, INT_MAX);
+		lazy.resize(4 * n, 0);
+	}
+ 
+	void build(int start, int end, int node, vector<int> &arr)
+	{
+		if (start == end)
+		{
+			st[node] = arr[start];
+			return;
+		}
+ 
+		int mid = start + (end - start) / 2;
+		// build left subtree
+		build(start, mid, 2 * node + 1, arr);
+		// build right subtree
+		build(mid + 1, end, 2 * node + 2, arr);
+		st[node] = min(st[2 * node + 1] , st[2 * node + 2]) ;
+	}
+ 
+	int query(int start, int end, int node, int l, int r)
+	{
+		// propagating
+		if (lazy[node] != 0)
+		{
+			st[node] = st[node] + lazy[node];
+			if (start != end)
+			{
+				lazy[2 * node + 1] += lazy[node];
+				lazy[2 * node + 2] += lazy[node];
+			}
+			lazy[node] = 0;
+		}
+ 
+		// zero overlap
+		if (l > end || r < start)
+		{
+			return INT_MAX;
+		}
+ 
+		// complete overlap
+		if (l <= start && end <= r)
+		{
+			return st[node];
+		}
+ 
+		// partial overlap
+		int mid = start + (end - start) / 2;
+		int lsub = query(start, mid, 2 * node + 1, l, r);
+		int rsub = query(mid + 1, end, 2 * node + 2, l, r);
+ 
+		return min(lsub, rsub);
+	}
+ 
+	void update(int start, int end, int node, int l, int r, int value)
+	{
+		// propagating
+		if (lazy[node] != 0)
+		{
+			st[node] = st[node] + lazy[node];
+			if (start != end)
+			{
+				lazy[2 * node + 1] += lazy[node];
+				lazy[2 * node + 2] += lazy[node];
+			}
+			lazy[node] = 0;
+		}
+ 
+		if (l > end || r < start)
+		{
+			return;
+		}
+ 
+		// complete overlap
+		if (l <= start && end <= r)
+		{
+			st[node] = st[node] + value;
+			if (start != end)
+			{
+				lazy[2 * node + 1] += value;
+				lazy[2 * node + 2] += value;
+			}
+			return;
+		}
+ 
+		// partial overlap
+		int mid = start + (end - start) / 2;
+		update(start, mid, 2 * node + 1, l, r, value);
+		update(mid + 1, end, 2 * node + 2, l, r, value);
+		st[node] = min(st[2 * node + 1], st[2 * node + 2]);
+ 
+		return;
+	}
+ 
+	int query(int l, int r)
+	{
+		return query(0, n - 1, 0, l, r);
+	}
+ 
+	void build(vector<int> &arr)
+	{
+		build(0, n - 1, 0, arr);
+	}
+ 
+	void update(int l, int r, int value)
+	{
+		update(0, n - 1, 0, l, r, value);
+	}
+};
