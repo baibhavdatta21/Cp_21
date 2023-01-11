@@ -1,0 +1,40 @@
+void build(int i,int sum,vector<int>&fen){
+    while(i<fen.size()){
+        fen[i]+=sum;
+        i+=(i&(-i));
+    }
+}
+int calculate(int i,vector<int>&fen){
+    int sum=0;
+    while(i>0){
+        sum+=fen[i];
+        i-=(i&(-i));
+    }
+    return sum;
+}
+int query(int low,int high,vector<int>&fen){
+    return calculate(high,fen)-calculate(low-1,fen);
+}
+void solver(){
+    int n;
+    cin>>n;
+    vector<int>v(n);
+    for(int i=0;i<n;i++){
+        cin>>v[i];
+    }
+    vector<int>fen(n+1,0);
+    for(int i=0;i<n;i++){
+        build(i+1,v[i],fen);
+    }
+    for(auto it:fen)
+        cout<<it<<" ";
+    cout<<endl;
+    int q;
+    cin>>q;
+    while(q--){
+        int a,b;
+        cin>>a>>b;
+        cout<<query(a,b,fen)<<endl;//taking 1-based indexing;
+
+    }
+}
